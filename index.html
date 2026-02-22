@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreeCraft | ОФИЦИАЛЬНЫЙ САЙТ</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --neon: #39ff14;
+            --neon-alt: #00f3ff;
+            --bg: #050505;
+            --panel: rgba(15, 15, 15, 0.95);
+            --border: 2px solid var(--neon);
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--bg);
+            color: #eee;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* АНИМИРОВАННЫЙ ФОН МАТРИЦА/ЧАСТИЦЫ */
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.4; }
+
+        .container { max-width: 700px; margin: 0 auto; padding: 20px; position: relative; }
+
+        /* ШАПКА */
+        .header {
+            text-align: center;
+            padding: 60px 20px;
+            margin-bottom: 40px;
+            border-bottom: 3px solid var(--neon);
+            box-shadow: 0 10px 40px rgba(57, 255, 20, 0.3);
+            background: linear-gradient(180deg, #102510 0%, #050505 100%);
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 10vw, 5rem);
+            color: var(--neon);
+            text-shadow: 0 0 20px var(--neon);
+            margin: 0;
+            letter-spacing: 5px;
+            animation: pulse 2.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); text-shadow: 0 0 20px var(--neon); }
+            50% { transform: scale(1.05); text-shadow: 0 0 40px var(--neon), 0 0 60px var(--neon); }
+            100% { transform: scale(1); text-shadow: 0 0 20px var(--neon); }
+        }
+
+        /* КАРТОЧКИ С НЕОНОВОЙ ОБВОДКОЙ */
+        .card {
+            background: var(--panel);
+            border: var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.1);
+            transition: 0.4s;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 40px rgba(57, 255, 20, 0.4);
+            border-color: var(--neon-alt);
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-alt);
+            font-size: 1.5rem;
+            margin-top: 0;
+            border-bottom: 2px solid #222;
+            padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* БЛОКИ КОПИРОВАНИЯ (БЕЗ БАГОВ) */
+        .copy-group { margin-bottom: 25px; }
+        .copy-group p { margin: 5px 0; font-weight: bold; color: #888; font-size: 0.9rem; }
+
+        .copy-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #000;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            transition: 0.3s;
+        }
+
+        .copy-box:hover { border-color: var(--neon); }
+
+        .ip-text {
+            color: #fff;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            letter-spacing: 1px;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 2px solid var(--neon);
+            color: var(--neon);
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-copy:hover {
+            background: var(--neon);
+            color: #000;
+            box-shadow: 0 0 25px var(--neon);
+        }
+
+        /* КОНСТИТУЦИЯ */
+        .law-item {
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 3px solid var(--neon);
+        }
+
+        .law-item b { color: var(--neon); text-transform: uppercase; font-size: 0.85rem; }
+
+        /* ИНСТРУКЦИЯ */
+        .instruction-box {
+            background: rgba(0, 243, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px dashed var(--neon-alt);
+        }
+
+        .version-tag {
+            background: var(--neon-alt);
+            color: #000;
+            padding: 2px 10px;
+            border-radius: 5px;
+            font-weight: 900;
+        }
+
+        footer {
+            text-align: center;
+            padding: 50px;
+            color: #444;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        /* МОБИЛЬНАЯ АДАПТАЦИЯ */
+        @media (max-width: 500px) {
+            .copy-box { flex-direction: column; text-align: center; }
+            .btn-copy { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="header">
+    <h1>FREECRAFT</h1>
+    <p style="color: var(--neon-alt); font-weight: bold; margin-top: 10px;">JAVA EDITION <span class="version-tag">1.21.9</span></p>
+</div>
+
+<div class="container">
+
+    <!-- КНОПКА СКОПИРОВАТЬ -->
+    <div class="card" id="copy-section">
+        <h2>📥 СКОПИРОВАТЬ АДРЕС</h2>
+        
+        <div class="copy-group">
+            <p>1 Сервер (24/7):</p>
+            <div class="copy-box">
+                <span class="ip-text">Freecraft.mcsh.io</span>
+                <button class="btn-copy" onclick="copy('Freecraft.mcsh.io')">КОПИРОВАТЬ</button>
+            </div>
+        </div>
+
+        <div class="copy-group">
+            <p>2 Сервер (ОСНОВНОЙ):</p>
+            <div class="copy-box">
+                <span class="ip-text">Freecraft5.duckdns.org:33231</span>
+                <button class="btn-copy" onclick="copy('Freecraft5.duckdns.org:33231')">КОПИРОВАТЬ</button>
+            </div>
+        </div>
+
+        <div class="copy-group">
+            <p>Название проекта:</p>
+            <div class="copy-box">
+                <span class="ip-text" style="color: var(--neon); font-size: 1.5rem;">FREECRAFT</span>
+                <button class="btn-copy" onclick="copy('Freecraft')">COPY NAME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- КОНСТИТУЦИЯ (ТЕКСТ ИЗ PASTEBIN) -->
+    <div class="card">
+        <h2>📜 КОНСТИТУЦИЯ ПРОЕКТА</h2>
+        
+        <div class="law-item">
+            <b>1. Судебная система:</b>
+            <p>У нас работает полноценный суд. Иски подаются через Telegram владельца. Наказание выносится после разбора улик.</p>
+        </div>
+
+        <div class="law-item">
+            <b>2. Создание страны:</b>
+            <p>Чтобы основать государство, нужно предоставить: 10 слитков железа, 64 доски и готовый жилой дом.</p>
+        </div>
+
+        <div class="law-item">
+            <b>3. Получение Админки:</b>
+            <p>Строгие критерии: Подписание договора, постройка 2 зданий для игроков и привлечение новых людей.</p>
+        </div>
+
+        <div class="law-item">
+            <b>4. Запреты (BAN):</b>
+            <p>Гриферство вне официальных войн, нацистская символика, маты в глобальном чате, читы и лаг-машины.</p>
+        </div>
+    </div>
+
+    <!-- ИНСТРУКЦИЯ ПО ВХОДУ -->
+    <div class="card">
+        <h2>💻 КАК ПРИСОЕДИНИТЬСЯ?</h2>
+        <div class="instruction-box">
+            <p><b>ANDROID:</b> Установите <b>PojavLauncher</b> из Google Play. Создайте профиль, выберите версию Java <b>1.21.x</b> и добавьте сервер по одному из адресов выше.</p>
+            <p><b>PC:</b> Любой лаунчер (TLauncher, Prism, Official). Версия <b>1.21.9 Java</b>. Сетевая игра -> Добавить сервер.</p>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    ВЛАДЕЛЕЦ: @Qwertywasd_002 | DESIGNED BY AI FOR FREECRAFT <br>
+    © 2026 ВСЕ ПРАВА ЗАЩИЩЕНЫ
+</footer>
+
+<script>
+    // СКРИПТ КОПИРОВАНИЯ + ЗВУК
+    function copy(text) {
+        // Создаем звук клика программно
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(800, context.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.1);
+        osc.connect(gain);
+        gain.connect(context.destination);
+        osc.start();
+        osc.stop(context.currentTime + 0.1);
+
+        // Копирование
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "ГОТОВО!";
+            btn.style.borderColor = "#00f3ff";
+            setTimeout(() => { 
+                btn.innerText = originalText; 
+                btn.style.borderColor = "#39ff14";
+            }, 1500);
+        });
+    }
+
+    // МАТРИЦА ФОН
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const chars = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = [];
+    for(let x = 0; x < columns; x++) drops[x] = 1;
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#39ff14';
+        ctx.font = fontSize + 'px Orbitron';
+        for(let i = 0; i < drops.length; i++) {
+            const text = chars.charAt(Math.floor(Math.random() * chars.length));
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+            drops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 50);
+
+    window.onresize = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+</script>
+
+</body>
+</html>
